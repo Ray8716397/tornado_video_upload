@@ -2,9 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ word }}</title>
+    <title>camera</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="keywords" content="{{ word }}">
     <link rel="stylesheet" href="static/css/layui.css">
     <script src="static/js/jquery-3.5.1.min.js"></script>
 </head>
@@ -19,7 +18,7 @@
                 <div class="layui-tab-item layui-show">
                     <div class="layui-form layui-form-pane">
                         <h1 style="color: red">{{msg}}</h1>
-                        <form action="{{ url_for('login') }}" method="post">
+                        <form action="{{ reverse_url("login") }}" method="post">
                             <div class="layui-form-item">
                                 <label for="user_id" class="layui-form-label layui-icon layui-icon-username"></label>
                                 <div class="layui-input-inline">

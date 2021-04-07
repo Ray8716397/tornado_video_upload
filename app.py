@@ -5,19 +5,18 @@
 # @AUTHOR: Ray
 import os
 from configparser import ConfigParser
-import datetime
 
 import tornado.ioloop
 import tornado.web
 
 import socketio
 
+from handlers import MainHandler
+
 # load config.ini
 config_file = "./config.ini"
 config = ConfigParser()
 config.read(config_file)
-
-version = datetime.datetime.now().timestamp()
 
 users_ws_count = {}  # [req sid]
 users_db = [f"7001_%03d" % i for i in range(1, 6)]
@@ -25,10 +24,6 @@ users_db.extend([f"7002_%03d" % i for i in range(1, 27)])
 
 sio = socketio.AsyncServer(async_mode='tornado')
 
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("app.html")
 
 
 @sio.event
@@ -90,13 +85,10 @@ def main():
     class Application(tornado.web.Application):  # 引入Application类，重写方法，这样做的好处在于可以自定义，添加另一些功能
         def __init__(self):
             handlers = [
-                (r'/', main.IndexHandler),
-                (r'/explore', main.ExploreHandler),
-                (r'/post/(?P<post_id>[0-9]+)', main.PostHandler),  # 命名组写法,使用关键字，路由与handler方法不一定顺序一致
-                (r'/upload', main.UploadHandler),
-                (r'/login', auth.LoginHandler),
-                (r'/logout', auth.LogoutHandler),
-                (r'/register', auth.RegisterHandler)
+                tornado.web.url(r'/', MainHandler.IndexHandler, name='index'),
+                tornado.web.url(r'/camera', MainHandler.CamHandler, name='camera'),
+                tornado.web.url(r'/login', MainHandler.LoginHandler, name='login'),
+                tornado.web.url(r'/logout', MainHandler.LogoutHandler, name='logout')
             ]
             settings = dict(
                 debug=True,  # 调试模式，修改后自动重启服务，不需要自动重启，生产情况下切勿开启，安全性
