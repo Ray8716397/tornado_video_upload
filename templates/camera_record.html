@@ -58,7 +58,7 @@
 			<dl id="result_log" class="df_con">
 				{% for min_res in today_min_res %}
 				<dd class='df_item'><li class='big'>{{min_res['record_time']}}</li><li>{{min_res['score']}}</li></dd>
-                {% endfor %}
+                {% end %}
 			</dl>
 		</dt>
 		<dt class="data_form">
@@ -69,7 +69,7 @@
 			<dl id="hour_log" class="df_con">
 				{% for hour_res in all_hour_res %}
 				<dd class='df_item'><li class='big'>{{hour_res['record_time']}}</li><li>{{hour_res['score']}}</li></dd>
-                {% endfor %}
+                {% end %}
 			</dl>
 		</dt>
 		<dt class="data_echarts" id="data_echarts">

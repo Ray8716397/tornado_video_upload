@@ -11,6 +11,8 @@ from configparser import ConfigParser
 from pycket.session import SessionMixin
 
 # load config.ini
+from services.probResult import get_today_min_res, get_all_hour_res
+
 config_file = "./config.ini"
 config = ConfigParser()
 config.read(config_file)
@@ -57,13 +59,16 @@ class LogoutHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         # self.session.set('user_info','') #将用户的cookie清除
-        self.session.delete('user_info')
+        self.session.delete('id')
         self.redirect('/login')
 
 
 class CamHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
+
         self.render('camera_record.html', interval=config["h5record_video"].getint("interval"),
                     chunk_num=config["h5record_video"].getint("chunk_num"),
-                    websocket_uri=f"record_video", version=version, id=self.session.get('id'))
+                    websocket_uri=f"record_video", version=version, id=self.session.get('id'),
+                    today_min_res=get_today_min_res(self.session.get('id')),
+                    all_hour_res=get_all_hour_res(self.session.get('id')))

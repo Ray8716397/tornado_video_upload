@@ -6,12 +6,13 @@
 import os
 from configparser import ConfigParser
 
+import socketio
 import tornado.ioloop
 import tornado.web
 
-import socketio
 
 from handlers import MainHandler
+from handlers.SioHandler import sio
 
 # load config.ini
 config_file = "./config.ini"
@@ -22,64 +23,6 @@ users_ws_count = {}  # [req sid]
 users_db = [f"7001_%03d" % i for i in range(1, 6)]
 users_db.extend([f"7002_%03d" % i for i in range(1, 27)])
 
-sio = socketio.AsyncServer(async_mode='tornado')
-
-
-
-@sio.event
-async def my_event(sid, message):
-    await sio.emit('my_response', {'data': message['data']}, room=sid)
-
-
-@sio.event
-async def my_broadcast_event(sid, message):
-    await sio.emit('my_response', {'data': message['data']})
-
-
-@sio.event
-async def join(sid, message):
-    sio.enter_room(sid, message['room'])
-    await sio.emit('my_response', {'data': 'Entered room: ' + message['room']},
-                   room=sid)
-
-
-@sio.event
-async def leave(sid, message):
-    sio.leave_room(sid, message['room'])
-    await sio.emit('my_response', {'data': 'Left room: ' + message['room']},
-                   room=sid)
-
-
-@sio.event
-async def close_room(sid, message):
-    await sio.emit('my_response',
-                   {'data': 'Room ' + message['room'] + ' is closing.'},
-                   room=message['room'])
-    await sio.close_room(message['room'])
-
-
-@sio.event
-async def my_room_event(sid, message):
-    await sio.emit('my_response', {'data': message['data']},
-                   room=message['room'])
-
-
-@sio.event
-async def disconnect_request(sid):
-    await sio.disconnect(sid)
-
-
-@sio.event
-async def connect(sid, environ):
-    print(environ['QUERY_STRING'])
-    # sio.start_background_task(background_task)
-    await sio.emit('my_response', {'data': 'Connected', 'count': 0}, room=sid)
-
-
-@sio.event
-def disconnect(sid):
-    print('Client disconnected')
-
 
 def main():
     class Application(tornado.web.Application):  # 引入Application类，重写方法，这样做的好处在于可以自定义，添加另一些功能
@@ -88,7 +31,8 @@ def main():
                 tornado.web.url(r'/', MainHandler.IndexHandler, name='index'),
                 tornado.web.url(r'/camera', MainHandler.CamHandler, name='camera'),
                 tornado.web.url(r'/login', MainHandler.LoginHandler, name='login'),
-                tornado.web.url(r'/logout', MainHandler.LogoutHandler, name='logout')
+                tornado.web.url(r'/logout', MainHandler.LogoutHandler, name='logout'),
+                (r"/socket.io/", socketio.get_tornado_handler(sio))
             ]
             settings = dict(
                 debug=True,  # 调试模式，修改后自动重启服务，不需要自动重启，生产情况下切勿开启，安全性
@@ -96,6 +40,7 @@ def main():
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
                 login_url='/login',  # 没有登录则跳转至此
                 cookie_secret='guijutech@!',  # 加密cookie的字符串
+                xsrf_cookie=True,
                 pycket={  # 固定写法packet，用于保存用户登录信息
                     'engine': 'redis',
                     'storage': {
@@ -116,7 +61,7 @@ def main():
                                               **settings)  # 用super方法将父类的init方法重新执行一遍，然后将handlers和settings传进去，完成初始化
 
     app = Application()  # 实例化
-    app.listen(config["h5record_video"].getint("flask_port"))
+    app.listen(config["h5record_video"].getint("tornado_port"))
     tornado.ioloop.IOLoop.current().start()
 
 
