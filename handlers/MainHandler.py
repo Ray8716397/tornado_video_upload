@@ -10,9 +10,10 @@ import tornado.web
 from configparser import ConfigParser
 from pycket.session import SessionMixin
 
-# load config.ini
 from services.probResult import get_today_min_res, get_all_hour_res
 
+
+# load config.ini
 config_file = "./config.ini"
 config = ConfigParser()
 config.read(config_file)
