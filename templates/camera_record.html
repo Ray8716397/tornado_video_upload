@@ -222,11 +222,11 @@ $(function(){
 
 	function connectWS() {
 		showWin();
-		socket = io.connect(location.origin + '/' + '{{websocket_uri}}');
+		socket = io.connect(location.origin + '/' + '{{websocket_uri}}?uid='+user_id);
 		socket.on('connect', function () {
 			console.log("websocket connect succeed");
-			hideWin();
-			getUserMedia();
+			//hideWin();
+			//getUserMedia();
 		});
 		socket.on('connect_error', function(error) {
 			alert('websocket connect_error')
@@ -246,19 +246,23 @@ $(function(){
 		});
 
 		socket.on('warning', function (msg) {
+		    alert(msg['msg']);
 			if (!msg['gohome']) {
 				socket.close();
+				hideWin();
 			}
-			alert(msg['msg']);
+
 			if (msg['gohome']) {
 				location.href = location.origin + '/' + 'login';
 			} else {
-
-				if ($("#start-recording").attr("disabled") !== "disabled") {
 					$("#stop-recording").click();
-				}
 			}
 		});
+
+        socket.on('connect_succeed', function () {
+            hideWin();
+			getUserMedia();
+        });
 
 		socket.on('show_min_res', function (msg) {
 			$("#result_log").prepend("<dd class='df_item'><li class='big'>" + msg['record_time'] + "</li><li>" + msg['score'] + "</li></dd>");

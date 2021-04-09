@@ -20,8 +20,6 @@ config = ConfigParser()
 config.read(config_file)
 
 users_ws_count = {}  # [req sid]
-users_db = [f"7001_%03d" % i for i in range(1, 6)]
-users_db.extend([f"7002_%03d" % i for i in range(1, 27)])
 
 
 def main():
@@ -51,7 +49,7 @@ def main():
                         'max_connections': 2 ** 33,
                     },
                     'cookie': {
-                        'expires_days': 38,
+                        'expires_days': 1,
                         'max_age': 100
                     }
                 }
@@ -62,7 +60,7 @@ def main():
 
     app = Application()  # 实例化
     app.listen(config["h5record_video"].getint("tornado_port"))
-    tornado.ioloop.IOLoop.current().start()
+    tornado.ioloop.IOLoop.instance().start()
 
 
 if __name__ == "__main__":

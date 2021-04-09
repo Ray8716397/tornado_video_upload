@@ -66,9 +66,9 @@ class LogoutHandler(BaseHandler):
 class CamHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
-
+        user_id = self.session.get('id')
         self.render('camera_record.html', interval=config["h5record_video"].getint("interval"),
                     chunk_num=config["h5record_video"].getint("chunk_num"),
-                    websocket_uri=f"record_video", version=version, id=self.session.get('id'),
-                    today_min_res=get_today_min_res(self.session.get('id')),
-                    all_hour_res=get_all_hour_res(self.session.get('id')))
+                    websocket_uri=f"record_video", version=version, id=user_id,
+                    today_min_res=get_today_min_res(user_id),
+                    all_hour_res=get_all_hour_res(user_id))
