@@ -9,7 +9,7 @@ import pika
 def pub(exchange_name, exchange_type, routing_key, message):
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
+    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type)
 
     channel.basic_publish(
         exchange=exchange_name, routing_key=routing_key, body=message)
