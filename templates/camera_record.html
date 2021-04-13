@@ -101,7 +101,7 @@ $(function(){
 	var chunk_num = {{chunk_num}};
 	var record_interval = {{interval}};
 	var user_id = '{{ id }}';
-    var mediaRecorder, socket, record_count, interval, curDate, videoStream, start_record_time;
+    var mediaRecorder, socket, record_count, curDate, videoStream, start_record_time;
     var hour_false_count = 0;
 
     // get supported codec
@@ -177,9 +177,6 @@ $(function(){
             video.srcObject = stream;
         }
         video.play();
-        interval = setInterval(function () {
-			socket.emit('get_score', user_id);
-		}, 5000);
 
 		recordAndSendVideo(videoStream);
 
@@ -290,7 +287,6 @@ $(function(){
 		if (video.srcObject.getTracks()[0].readyState === "live") {
 			video.srcObject.getTracks()[0].stop();
 		}
-        clearInterval(interval);
         try {
 			socket.close();
 		} catch (e) {

@@ -44,7 +44,7 @@ def main():
                     'storage': {
                         'host': 'localhost',
                         'port': 6379,
-                        'db_sessions': 5,
+                        'db_sessions': 15,
                         'db_notifications': 11,
                         'max_connections': 2 ** 33,
                     },
